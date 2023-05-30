@@ -1,0 +1,155 @@
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Document</title>
+</head>
+<style>
+  .divmsg {
+    background-color: steelblue;
+    width: 50%;
+    height: 300px;
+    border-radius: 10px 10px;
+    padding: 5px;
+  }
+
+  .divmsg>p {
+    background-color: thistle;
+    font-style: bold;
+    padding-left: 5px;
+    padding-right: 5px;
+  }
+
+  .divmsg>p>span {
+    margin-left: 5px;
+  }
+
+  .divinput {
+    width: 50%;
+    height: 50px;
+  }
+
+
+
+  .dbtn {
+    display: flex;
+    justify-content: center;
+  }
+
+  .dbtn>input {
+    width: 100%;
+  }
+
+  .user {
+    font-style: italic;
+  }
+
+  .video {
+    border-radius: 2px solid #eee;
+    border-color: steelblue;
+    height: 500px;
+    width: 500px;
+  }
+</style>
+<script src="/socket.io/socket.io.js"></script>
+
+<body>
+  <h1>hola</h1>
+  <strong>{{title}}</strong>
+  <form id="formLogin">
+    <input type="text" name="correo" id="correo" /><br />
+    <input type="text" name="pass" id="pass" /><br />
+    <input type="button" value="Ingresar" onclick="login()" />
+  </form>
+  <hr>
+  <p id="typing"></p>
+  <div class="divmsg" id="divmsg">
+
+  </div>
+  <div class="divinput">
+    <div class="dbtn">
+      <input type="text" id="inputmsg" name="inputmsg">
+      <select name="received" id="received">
+
+      </select>
+      <button id="btnsend" onclick="sendMsg()">send</button>
+    </div>
+  </div>
+
+
+
+  <script>
+    const socket = io.connect();
+    //socket.on("connect", () => { });
+    socket.on("new_conexion", function (rs) {
+      console.log(rs)
+    });
+    socket.on("listuser", function (data) {
+      console.log(data)
+      let slec = document.getElementById("received");
+      let op = ''
+      for (let item of data) {
+        op += '<option>' + item + '</option>'
+      }
+      slec.innerHTML = op
+    });
+
+    const login = () => {
+      let form = document.getElementById("formLogin");
+      console.log(form.children)
+      const correo = form.children[0].value;
+      const pass = form.children[2].value;
+      const dts = { correo, pass }
+      socket.emit("datosUser", dts);
+    };
+    const sendMsg = () => {
+      const input = document.querySelector("#inputmsg");
+      const received = document.querySelector("#received");
+      const user = document.querySelector("#correo").value;
+      socket.emit("sendmsg", { msg: input.value, user: user, to: received.value })
+      input.value = '';
+      received.value = ''
+      input.focus()
+      document.getElementById("typing").innerText = ''
+    };
+    const input = document.querySelector("#inputmsg");
+    input.addEventListener('keypress', (e) => {
+      const user = document.querySelector("#correo").value;
+      sockeEmit('typing', { user: user });
+    });
+
+    socket.on("typing", (data) => {
+      document.getElementById("typing").innerText = `El usuario ${data.user} esta escribiendo...`
+
+    })
+
+    //emit general
+    const sockeEmit = (name, params) => {
+      socket.emit(name, params)
+    };
+    socket.on("recivedmsg", function (data) {
+      document.getElementById("typing").innerText = ''
+      let div = document.getElementById("divmsg");
+      let p = document.createElement('p');
+      let strong = document.createElement('strong');
+      let span = document.createElement('span');
+      strong.setAttribute('class', 'user')
+      strong.innerText = `${data.user}:`
+      span.innerText = `${data.msg}`
+      p.appendChild(strong)
+      p.appendChild(span)
+      div.appendChild(p)
+
+    });
+
+
+
+
+
+
+  </script>
+</body>
+
+</html>
