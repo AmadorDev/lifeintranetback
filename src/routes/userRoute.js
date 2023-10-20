@@ -34,11 +34,13 @@ const {
   ContactEmergency,
   CertificateAdd,
   CertificateByUser,
+  getIdByName,
 } = require("../controllers/userController");
 const { upload } = require("../utils/uploads");
 
 router.get("/", authenticateJWT, getMe);
 router.get("/list", list);
+router.post("/search-name/", getIdByName);
 router.get("/list/:q", query);
 router.get("/detail/:id", getPerfil);
 router.get("/hbs", HappyBirtday);

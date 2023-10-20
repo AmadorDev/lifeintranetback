@@ -6,6 +6,12 @@ const SlideSchema = new Schema(
       type: Schema.Types.ObjectId,
       ref: "slider",
     },
+    name: {
+      type: String,
+    },
+    category: {
+      type: String,
+    },
     section: {
       type: String,
       required: true,

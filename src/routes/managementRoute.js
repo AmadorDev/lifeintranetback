@@ -11,12 +11,14 @@ const {
   videosFind,
   sliderSection,
   sliderDestroy,
-} = require("../controllers/managementContorller");
+  sliderStoreDocs,
+} = require("../controllers/managementController");
 //authenticateJWT
 
 router.get("/sliders", sliders);
 router.get("/sliders/:s", sliderSection);
 router.post("/sliders", sliderStore);
+router.post("/docs/sliders", sliderStoreDocs);
 router.delete("/sliders", sliderDestroyAll);
 router.delete("/sliders/:id", sliderDestroy);
 

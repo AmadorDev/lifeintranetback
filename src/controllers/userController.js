@@ -207,6 +207,24 @@ const getPerfil = async (req, res, next) => {
   }
 };
 
+
+const getIdByName = async (req, res, next) => {
+  try {
+    
+    const user = await User.findOne({ name: req.body.name }); 
+  
+    if (user) {
+      const userId = user._id;
+      getResponse(res, { code: 200, data: userId });
+    } else {
+      getResponse(res, { code: 500, data:'no se encontro el usuario' });
+    }
+  } catch (e) {
+    getResponse(res, { code: 500, data: e.errors });
+  }
+};
+
+
 const profile = async (req, res, next) => {
   if (req.file) {
     if (req.file !== undefined || req.file !== null) {
@@ -282,6 +300,9 @@ const loginApi = async (req, res, next) => {
   try {
     let url = `${process.env.URL_LIFE}/login`;
     let result = await apiPublic("POST", url, creden, null);
+    console.log("-----------------",url)
+    console.log("-----------------",result)
+    console.log("-----------------",creden)
     if (result?.token) {
       let urlme = `${process.env.URL_LIFE}/me`;
       let user = await apiPublic("GET", urlme, {}, result.token);
@@ -620,4 +641,5 @@ module.exports = {
   ContactEmergencyAdd,
   CertificateAdd,
   CertificateByUser,
+  getIdByName
 };

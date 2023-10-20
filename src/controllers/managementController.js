@@ -2,6 +2,7 @@ const { Slider, VideoX } = require("../models");
 const { getResponse } = require("../utils/response");
 const { apiPublic } = require("../services/callEp");
 const { uploadCover } = require("../utils/uploadCover");
+const { uploadDocs } = require("../utils/uploadDocs");
 
 //------------------------------ slider-----------------------------
 //get list
@@ -18,7 +19,8 @@ const sliders = async (req, res) => {
 const sliderSection = async (req, res) => {
   try {
     const s = req.params.s;
-    const slides = await Slider.find({ section: s });
+    const cate = req.query.cate;
+    const slides = await Slider.find({ section: s ,category:cate});
     res.json({ status: true, data: slides });
   } catch (err) {
     res.json({ status: false, message: err });
@@ -43,10 +45,39 @@ const sliderStore = async (req, res) => {
       const slide = new Slider({
         link: req.body.link,
         image: patch,
+        category:req.body.category || '',
         section: req.body.section,
       });
       await slide.save();
       res.json({ status: true, data: slide,message:"Procesado correctamente !" });
+    } catch (err) {
+      res.json({ status: false, message: err });
+    }
+  });
+};
+
+const uploadDoc = uploadDocs.single("doc");
+const sliderStoreDocs = async (req, res) => {
+  uploadDoc(req, res, async function (err) {
+    console.log(req.body);
+    if (err) return res.json({ status: false, message: err });
+    if (!req.file)
+      return res.json({
+        status: false,
+        message: "required type file _doc_ ",
+      });
+
+    let patch = `${process.env.PATH_HOST}/${process.env.UP_DOCS_RUTA}/${req.file.filename}`;
+    try {
+      const slide = new Slider({
+        link: req.body.link,
+        image: patch,
+        name:req.body.name || '',
+        category:req.body.category || '',
+        section: req.body.section,
+      });
+      await slide.save();
+      res.json({ status: true, data: slide, message:"Procesado correctamente !" });
     } catch (err) {
       res.json({ status: false, message: err });
     }
@@ -156,6 +187,7 @@ module.exports = {
   sliders,
   sliderSection,
   sliderStore,
+  sliderStoreDocs,
   sliderDestroyAll,
   sliderDestroy,
   videosX,

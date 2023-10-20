@@ -14,6 +14,7 @@ const Post = require("./Post");
 const Comment = require("./Comment");
 const Slider = require("./Slider");
 const VideoX = require("./VideoX");
+const Notification = require("./Notifications");
 
 module.exports = {
   User,
@@ -29,5 +30,6 @@ module.exports = {
   Post,
   Poll,
   Slider,
-  VideoX
+  VideoX,
+  Notification
 };
