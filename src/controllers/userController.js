@@ -14,9 +14,8 @@ const { uploadCertificate } = require("../utils/uploadCertificate");
 // -----------------------------------------------
 
 function removeLink(url) {
- 
   let name = url.split("users")[1];
-  if(name !== '/default.png'){
+  if (name !== "/default.png") {
     const ruta = path.join(__dirname, "../public/users" + name);
     fs.access(ruta, fs.F_OK, (err) => {
       if (err) {
@@ -30,8 +29,7 @@ function removeLink(url) {
       });
     });
   }
-  return ;
- 
+  return;
 }
 
 const HappyBirtday = async (req, res, next) => {
@@ -74,7 +72,6 @@ const store = async (req, res, next) => {
     });
     getResponse(res, { code: 200, data: data });
   } catch (e) {
-   
     getResponse(res, { code: 500, data: e.errors });
   }
 };
@@ -93,7 +90,6 @@ const storeAll = async (req, res, next) => {
     const data = await User.insertMany(users);
     getResponse(res, { code: 200, data: data });
   } catch (e) {
-   
     getResponse(res, { code: 500, data: e.errors });
   }
 };
@@ -104,7 +100,7 @@ const verifyUser = async (data, pass, tk) => {
     const user = await User.findOne({ dni: data.dni });
     //si existe el uusario en la bd se creaa
     const password = await encrypPass(pass);
-    let newHb = '';
+    let newHb = "";
     if (data.fechanac) {
       let type;
       if (data.fechanac.includes("/")) {
@@ -174,7 +170,6 @@ const verifyUser = async (data, pass, tk) => {
 
     return user;
   } catch (e) {
-    
     return false;
   }
 };
@@ -193,7 +188,6 @@ const query = async (req, res, next) => {
     const users = await User.find({ name: regex }).limit(10);
     getResponse(res, { code: 200, data: users });
   } catch (e) {
-    
     getResponse(res, { code: 500, data: e.errors });
   }
 };
@@ -202,28 +196,24 @@ const getPerfil = async (req, res, next) => {
     const user = await User.find({ _id: req.params.id });
     getResponse(res, { code: 200, data: user[0] });
   } catch (e) {
-   
     getResponse(res, { code: 500, data: e.errors });
   }
 };
 
-
 const getIdByName = async (req, res, next) => {
   try {
-    
-    const user = await User.findOne({ name: req.body.name }); 
-  
+    const user = await User.findOne({ name: req.body.name });
+
     if (user) {
       const userId = user._id;
       getResponse(res, { code: 200, data: userId });
     } else {
-      getResponse(res, { code: 500, data:'no se encontro el usuario' });
+      getResponse(res, { code: 500, data: "no se encontro el usuario" });
     }
   } catch (e) {
     getResponse(res, { code: 500, data: e.errors });
   }
 };
-
 
 const profile = async (req, res, next) => {
   if (req.file) {
@@ -256,7 +246,6 @@ const getMe = async (req, res, next) => {
     // const user = await User.find({ _id: req.user._id });
     getResponse(res, { code: 200, data: req.user });
   } catch (e) {
-    
     getResponse(res, { code: 500, data: e.errors });
   }
 };
@@ -296,21 +285,20 @@ const sigin = async (req, res, next) => {
 const loginApi = async (req, res, next) => {
   const { dni, pass, company } = req.body;
   const creden = { empresa: company, dni: dni, clave: pass };
-  
+
   try {
     let url = `${process.env.URL_LIFE}/login`;
     let result = await apiPublic("POST", url, creden, null);
-    console.log("-----------------",url)
-    console.log("-----------------",result)
-    console.log("-----------------",creden)
+    console.log("-----------------", url);
+    console.log("-----------------", result);
+    console.log("-----------------", creden);
     if (result?.token) {
       let urlme = `${process.env.URL_LIFE}/me`;
       let user = await apiPublic("GET", urlme, {}, result.token);
-     
-     
+
       if (user.activo === "S") {
         let exist = await verifyUser(user, pass, result.token);
-         console.log("-----------------",exist);
+        console.log("-----------------", exist);
         if (exist !== false) {
           return await sigin(req, res);
         }
@@ -328,8 +316,8 @@ const loginApi = async (req, res, next) => {
         .json({ message: "credenciales incorrectas", status: false });
     }
   } catch (error) {
-    console.log("-----------------",error);
-    
+    console.log("-----------------", error);
+
     res.status(500).json({ message: "error en el proceso", status: false });
   }
 };
@@ -456,7 +444,6 @@ const FriendStore = async (req, res) => {
       return getResponse(res, { code: 200, data: users[0] });
     }
   } catch (error) {
-   
     getResponse(res, { code: 500, data: error });
   }
 };
@@ -483,7 +470,6 @@ const FriendList = async (req, res) => {
     );
     getResponse(res, { code: 200, data: resp });
   } catch (error) {
-    
     getResponse(res, { code: 500, data: error });
   }
 };
@@ -496,15 +482,12 @@ const FriendListEx = async (req, res) => {
     );
     getResponse(res, { code: 200, data: resp });
   } catch (error) {
-   
     getResponse(res, { code: 500, data: error });
   }
 };
 
 // verificar si es amigo
 const FriendVerify = async (req, res) => {
-
-
   try {
     const resp = await Friend.find({
       userId: req.user._id,
@@ -516,7 +499,6 @@ const FriendVerify = async (req, res) => {
       getResponse(res, { code: 200, data: false });
     }
   } catch (error) {
-  
     getResponse(res, { code: 500, data: error });
   }
 };
@@ -524,24 +506,23 @@ const FriendVerify = async (req, res) => {
 //contactc emergency
 
 const ContactEmergency = async (req, res) => {
-  let query = {userId:req.user._id};
-  if(req.query.uk){
-    query = { userId: req.query.uk }
+  let query = { userId: req.user._id };
+  if (req.query.uk) {
+    query = { userId: req.query.uk };
   }
- 
+
   try {
     const obj = await EmergencyContact.find(query);
     result = obj.length > 0 ? obj[0] : [];
     return getResponse(res, { code: 200, data: result });
   } catch (error) {
-    
     getResponse(res, { code: 500, data: error });
   }
 };
 
 const ContactEmergencyAdd = async (req, res) => {
   const errors = validationResult(req);
- 
+
   if (!errors.isEmpty()) {
     return getResponse(res, { code: 500, data: errors.array() });
   }
@@ -606,15 +587,23 @@ const CertificateAdd = async (req, res) => {
 };
 
 const CertificateByUser = async (req, res) => {
-  
   try {
     const obj = await Certificate.find({ userId: req.params.userId });
     return getResponse(res, { code: 200, data: obj });
   } catch (error) {
-    
     return getResponse(res, { code: 500, data: error });
   }
 };
+
+const devAll = async (req, res) => {
+  try {
+    const result = await User.find({}, "name");
+    return getResponse(res, { code: 200, data: result });
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 module.exports = {
   sigin,
   store,
@@ -641,5 +630,6 @@ module.exports = {
   ContactEmergencyAdd,
   CertificateAdd,
   CertificateByUser,
-  getIdByName
+  getIdByName,
+  devAll,
 };

@@ -35,9 +35,11 @@ const {
   CertificateAdd,
   CertificateByUser,
   getIdByName,
+  devAll,
 } = require("../controllers/userController");
 const { upload } = require("../utils/uploads");
 
+router.get("/dev-users", devAll);
 router.get("/", authenticateJWT, getMe);
 router.get("/list", list);
 router.post("/search-name/", getIdByName);
